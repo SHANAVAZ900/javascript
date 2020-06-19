@@ -1,8 +1,10 @@
+..
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>REGISTRATION</title>
+    <script type="text/javascript" src="{{url_for('static',filename ='registration.js')}}"></script>
     <style>
         .container {
             background-color: hotpink;
@@ -13,13 +15,16 @@
 <body>
     <div" class="container">
 
-        <form align="center" Style="padding-top:250px" ; method="POST" name="form">
+        <form align="center" Style="padding-top:250px" ; method="POST" name="register">
             <label> username:</label>
-            <input type="text" name="username" style="color:hotpink;" required /> <br />
+            <input type="text" name="username" style="color:hotpink;" /> <br />
             <p style="color:hotpink;" class="usermessage"></p><br />
             <label>password:</label>
-            <input type="password" name="password" style="color:hotpink;" required /><br />
+            <input type="password" name="password" style="color:hotpink;" /><br />
             <p style="color:hotpink;" class="passmessage"></p><br />
+            <label>Email ID:</label>
+            <input type="email" id="mail" name="email" /><br />
+            <p style="color:red;" class="emailmessage"></p><br />
             <button type="submit" formmethod="POST" onclick="return validateForm()"
                 formaction="{{ url_for('userDetails') }}"> Register </button>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;
