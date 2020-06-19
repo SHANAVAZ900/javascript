@@ -41,6 +41,7 @@ def userDetails():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        email = request.form.get("email")
 
         # checking the user data is present or not
         userData = User.query.filter_by(username=username).first()
@@ -49,7 +50,7 @@ def userDetails():
             return render_template("registration.html", message="email already exists, Please login.")
         else:
             user = User(
-                username=username, password=password, timeStamp=time.ctime(time.time()))
+                username=username, password=password, timeStamp=time.ctime(time.time()), email=email)
 
             # checking the registration details entered perfectly or not
             try:
@@ -131,7 +132,7 @@ def bookpage(username, isbn):
             for j in (parsed[i]):
                 res = j
 
-        return render_template("bookpage.html", book=book, res=res,  username=user1)
+        return render_template("bookpage.html", book=book, res=res, username=user1)
 
     else:
         return redirect(url_for('index'))
