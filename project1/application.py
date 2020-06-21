@@ -5,6 +5,7 @@ from flask import Flask, json, redirect, render_template, request, session, url_
 from register import *
 from sqlalchemy import or_
 from booklist import books
+from flask.json import jsonify
 
 
 app = Flask(__name__)
@@ -109,6 +110,44 @@ def search(username):
         result = books.query.filter(or_(books.title.ilike(
             res), books.author.ilike(res), books.isbn.ilike(res))).all()
         return render_template("search.html", result=result, username=username)
+
+
+@app.route("/api/search/", methods=["POST"])
+def search_api():
+
+    if request.method == "POST":
+        var = request.json
+
+        res = var["search"]
+        res = "%" + res + "%"
+
+        result = books.query.filter(or_(books.title.ilike(res), books.author.ilike(res), books.isbn.ilike(res))
+                                    ).all()
+
+        if result is None:
+            return jsonify({"error": "Book not found"}), 400
+
+        book_ISBN = []
+        book_TITLE = []
+        book_AUTHOR = []
+        book_YEAR = []
+
+        for eachresult in result:
+            book_ISBN.append(eachresult.isbn)
+            book_TITLE.append(eachresult.title)
+            book_AUTHOR.append(eachresult.author)
+            book_YEAR.append(eachresult.year)
+
+        dict = {
+            "isbn": book_ISBN,
+            "title": book_TITLE,
+            "author": book_AUTHOR,
+            "year": book_YEAR,
+        }
+        print("returning")
+        print(dict)
+        return jsonify(dict), 200
+    return "<h1>Come again</h1>"
 
 
 @app.route("/bookpage/<username>/<isbn>", methods=["POST", "GET"])
