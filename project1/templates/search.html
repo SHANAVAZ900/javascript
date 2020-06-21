@@ -7,6 +7,54 @@
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
         integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <script>
+
+        function loadDoc() {
+            let request = new XMLHttpRequest();
+            var res = document.forms['res']['find'].value;
+            console.log(res)
+            // var url = "http//:127.0.0.1:5000/api/search/" + "?" + "search=" + res
+            request.open("POST", "/api/search/");
+            request.setRequestHeader("Content-Type", "application/json");
+            request.send(JSON.stringify({
+                "search": res
+            }));
+            request.onload = () => {
+
+                if (request.status === 200) {
+                    console.log("entered3")
+                    var data = JSON.parse(request.responseText)
+                    console.log(data)
+                    let str = ""
+                    lst = []
+
+
+
+                    for (let i = 0; i < data["author"].length; i++) {
+
+
+                        str = str + "<tr>" +
+                            "<td>" + "<a href=javascript:bookPage(" + i + ")>" + data["isbn"][i] + "</a>" + "</td>" +
+                            "<td>" + data["title"][i] + "</td>" +
+                            "<td>" + data["author"][i] + "</td>" +
+                            "<td>" + data["year"][i] + "</td>" + "</tr>"
+                        lst.push(data["isbn"][i])
+                        console.log(str)
+
+                    }
+                    document.getElementById("tb").innerHTML = str;
+
+                } else {
+                    console.log(`error ${request.status} ${request.statusText}`)
+                }
+
+            }
+            event.preventDefault()
+            return false
+        }
+
+    </script>
+
 </head>
 
 <body>
@@ -22,11 +70,13 @@
         <div class="container">
             <div class="d-flex justify-content-center">
                 <div class="searchbar">
-                    <form>
+                    <form name="res">
                         <input class="search_input" type="text" name="find" placeholder="search_input">
 
-                        <button type="submit" class="btn btn-success"
-                            formaction="{{ url_for('search',username=username) }}" formmethod="POST">Search</button>
+                        <button type="submit" class="btn btn-success" onclick="loadDoc()">Search</button>
+
+                        <!--<button type="submit" class="btn btn-success" onclick="loadDoc()"
+                            formaction="{{ url_for('search',username=username) }}" formmethod="POST">Search</button>-->
                     </form>
                 </div>
             </div>
@@ -41,15 +91,7 @@
                     <th scope="col">Year</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for book in result %}
-                <tr>
-                    <td><a href="{{url_for('bookpage',isbn=book.isbn,username=username)}}">{{book.isbn}}</a></td>
-                    <td>{{book.title}}</td>
-                    <td>{{book.author}}</td>
-                    <td>{{book.year}}</td>
-                </tr>
-                {% endfor %}
+            <tbody id="tb">
             </tbody>
         </table>
     </div>
