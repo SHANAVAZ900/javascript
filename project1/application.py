@@ -175,3 +175,40 @@ def bookpage(username, isbn):
 
     else:
         return redirect(url_for('index'))
+
+
+@app.route("/api/book/", methods=["POST"])
+def book_api():
+
+    if request.method == "POST":
+        var = request.json
+        res = var["isbn"]
+        isbn = res
+
+        book = books.query.filter_by(isbn=isbn).first()
+        res = requests.get(
+            "https://www.goodreads.com/book/review_counts.json",
+            params={"key": "GfoQsiFrU8JgChm0fDRMA", "isbns": isbn},
+        )
+
+        # Parsing the data
+        data = res.text
+        parsed = json.loads(data)
+        print(parsed)
+        res = {}
+        for i in parsed:
+            for j in parsed[i]:
+                res = j
+
+        if book is None:
+            return jsonify({"error": "Book not found"}), 400
+
+        dict = {
+            "isbn": isbn,
+            "title": book.title,
+            "author": book.author,
+            "year": book.year,
+            "average_rating": res["average_rating"],
+            "average_reviewcount": res["reviews_count"]
+        }
+        return jsonify(dict), 200
